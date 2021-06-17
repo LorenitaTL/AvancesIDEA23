@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Pixeles</title>
+  </head>
+  <body>
+    <canvas id="canvas" width="800" height="300"></canvas>
+
+    <script>
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+
+      let image = new Image();
+
+      image.src = "./perritos.jpg";
+      image.onload = function () {
+        console.log("Image loaded");
+
+        ctx.drawImage(image, 0, 0,);
+
+        convertirBlancoYNegro();
+      };
+
+      function convertirBlancoYNegro() {
+        //Obtener pixeles de la imagen
+        let imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        //Cada 4 elementos corresponden a un mismo pixel,
+        //pero en sus diferentes valores rgba
+        let pixeles = imageData.data;
+        for (let i = 0; i < pixeles.length; i += 4) {
+          const pixel = {
+            r: pixeles[i],
+            g: pixeles[i + 1],
+            b: pixeles[i + 2],
+            a: pixeles[i + 3],
+          };
+
+          const average = pixel.r + pixel.g + pixel.b / 3;
+
+          pixeles[i] = average;
+          pixeles[i + 1] = average;
+          pixeles[i + 2] = average;
+        }
+
+        ctx.putImageData(imageData,0,0)
+
+        console.log('Finallicé la conversión')
+      }
+    </script>
+  </body>
+</html>

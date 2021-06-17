@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Document</title>
+  </head>
+  <body>
+    <video id="video" width="600" muted>
+      <!--Incluirá el primer video que encuentre o que el navegador soporte-->
+      <source src="./Believer.mp4" type="video/mp4" />
+      <source src="./Believer.ogg" type="video/ogg" />
+      <source src="./Believer.webm" type="video/webm" />
+      <!--Si el navegador no soporta la etiqueta <video> se mostrará el sig. mensaje -->
+      Tu navegador no soport la etiqueta
+    </video>
+    <button id="playButton" type="button">Reproducir</button>
+    <button id="pauseButton" type="button">Pausar</button>
+    <button id="stopButton" type="button">Detener</button>
+    <button id="backwardButton" type="button">&lt;&lt</button>
+    <button id="forwardButton" type="button">&gt;&gt</button>
+    <button id="volumeUpButton" type="button">+</button>
+    <button id="volumeDownButton" type="button">-</button>
+    <script>
+      let video = document.getElementById("video");
+
+      let playButton = document.getElementById("playButton");
+      let pauseButton = document.getElementById("pauseButton");
+      let stopButton = document.getElementById("stopButton");
+
+      let backwardButton = document.getElementById("backwardButton");
+      let forwardButton = document.getElementById("forwardButton");
+
+      let volumeDownButton = document.getElementById("volumeDownButton");
+      let volumeUpButton = document.getElementById("volumeUpButton");
+
+      playButton.addEventListener("click", function () {
+        video.play();
+      });
+
+      pauseButton.addEventListener("click", function () {
+        video.pause();
+      });
+
+      stopButton.addEventListener("click", function () {
+        video.pause();
+
+        video.currentTime = 0;
+      });
+
+      backwardButton.addEventListener("click", function () {
+        video.currentTime -= 1;
+      });
+
+      forwardButton.addEventListener("click", function () {
+        video.currentTime += 1;
+      });
+
+      video.addEventListener("play", function () {
+        console.log("Reproducir");
+        setTimeout(() => {
+          video.muted = false;
+        }, 3000);
+      });
+
+      video.addEventListener("pause", function () {
+        console.log("Pausado");
+      });
+
+      video.addEventListener("playing", function () {
+        console.log("Reproduciendo");
+      });
+
+      video.addEventListener("timeupdate", function () {
+        console.log("Actualizando reproducción");
+        console.log(video.currentTime);
+      });
+
+      volumeDownButton.addEventListener("click", function () {
+        if (video.volume >= 0.1) video.volume -= 0.1;
+      });
+
+      volumeUpButton.addEventListener("click", function () {
+        if (video.volume <= 0.9) video.volume += 0.1;
+      });
+    </script>
+  </body>
+</html>

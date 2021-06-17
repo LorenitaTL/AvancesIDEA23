@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <canvas id="canvas" width="800" height="600"></canvas>
+    <video
+      id="video"
+      autoplay
+      style="display: none"
+      width="800"
+      height="600"
+    ></video>
+    <select id="camera-selector"></select>
+
+    <script src="clmtrackr-dev/build/clmtrackr.js"></script>
+    <script src="clmtrackr-dev/models/model_pca_20_svm.js"></script>
+    <script>
+      let video = document.getElementById("video");
+      let selectTag = document.getElementById("camera-selector");
+      let canvas = document.getElementById("canvas");
+      let lentes = new Image();
+      let imageLoaded = false;
+      const context = canvas.getContext("2d");
+      const ctracker = new clm.tracker();
+      ctracker.init(pModel);
+
+      lentes.src = "./lentes.png";
+
+      lentes.onload = function () {
+        imageLoaded = true;
+      };
+
+      navigator.mediaDevices.enumerateDevices().then((devices) => {
+        devices.forEach((device) => {
+          if (device.kind != "videoinput") return;
+
+          let optionTag = document.createElement("option");
+
+          optionTag.innerHTML = device.label;
+          optionTag.value = device.deviceId;
+          selectTag.appendChild(optionTag);
+        });
+      });
+
+      selectTag.addEventListener("change", function (ev) {
+        let deviceId = this.options[this.selectedIndex].value;
+
+        start(deviceId);
+      });
+
+      function start(deviceId = undefined) {
+        const constraints = {
+          video: {
+            deviceId: deviceId,
+          },
+        };
+        navigator.mediaDevices
+          .getUserMedia(constraints)
+          .then((stream) => {
+            video.srcObject = stream;
+            setTimeout(() => {
+              ctracker.start(video);
+              requestAnimationFrame(loop);
+            }, 500);
+          })
+          .catch((err) => console.log(err));
+      }
+
+      function drawImageRealTime(
+        imagen,
+        positions,
+        modifierWidth,
+        modifierHeight
+      ) {
+        if (
+          !positions.x.init ||
+          !positions.x.final ||
+          !positions.y.init ||
+          !positions.y.final
+        ) {
+          return;
+        }
+        positions.x.init[0] -= modifierWidth;
+        positions.x.final[0] += modifierWidth;
+
+        positions.x.init[1] -= modifierHeight;
+        positions.x.final[1] += modifierHeight;
+        const width = positions.x.final[0] - positions.x.init[0];
+        const height = positions.y.final[1] - positions.y.init[1];
+        context.drawImage(
+          imagen,
+          positions.x.init[0],
+          positions.y.init[1],
+          width,
+          height
+        );
+      }
+      function loop() {
+        context.drawImage(video, 0, 0, 800, 600);
+        ctracker.draw(canvas);
+        let positions = ctracker.getCurrentPosition();
+
+        console.log(positions);
+        if (imageLoaded) {
+          drawImageRealTime(
+            lentes,
+            {
+              x: {
+                init: positions[0],
+                final: positions[14],
+              },
+              y: {
+                init: positions[33],
+                final: positions[41],
+              },
+            },
+            0,
+            20
+          );
+        }
+
+        drawImageRealTime();
+        requestAnimationFrame(loop);
+      }
+
+      start();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <video id="video" autoplay></video>
+    <script>
+      let video = document.getElementById("video");
+      //MediaTrackConstraints
+      //Audio
+      /*
+        chanelCount =>{ ideal:10, exact:10},
+        latency,
+        sampleRate,
+        volume
+        */
+      const constraints = {
+        audio: {
+          //    chanelCount:{ideal:10, exact:10},
+          //    sampleRate:{},
+          //    volume:{},
+          echoCancellation: false,
+        },
+        video: {
+          aspectRatio: {},
+          width: 1280,
+          height: 720,
+          frameRate: { ideal: 10 },
+          facingMode: "user",
+        },
+      };
+      navigator.mediaDevices
+        .getUserMedia(constraints)
+        .then((stream) => {
+          video.srcObject = stream;
+        })
+        .catch((err) => console.log(err));
+    </script>
+  </body>
+</html>
